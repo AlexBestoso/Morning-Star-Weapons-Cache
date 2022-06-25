@@ -1,13 +1,22 @@
 class Module{
 	private:
 	string _name = "Module";
-	string _version = "0.0.0";
+	string version = "0.0.0";
 	bool _running = false;
 	int _context = -1;
 	string _baseStorage = "./storage";
 	string _moduleStorage = "";
 
 	public:
+	size_t commandCount = 0;
+	string *commandList;
+	void pError(string msg){
+        	fprintf(stderr, "\x1b[31m[E] %s\x1b[0m", msg.c_str());
+	}
+	void pSuccess(string msg){
+		printf("\x1b[32m[+] %s\x1b[0m", msg.c_str());
+	}
+
 	string getName(void){
 		return this->_name;
 	}
@@ -15,10 +24,10 @@ class Module{
 		this->_name = name;
 	}
 	string getVersion(void){
-		return this->_version;
+		return this->version;
 	}
 	void setVersion(string version){
-		this->_version = version;
+		this->version = version;
 	}
 	bool isRunning(void){
 		return this->_running;
@@ -77,6 +86,14 @@ class Module{
 	int promptUserInputInt(string msg, string pointer){
 		printf("%s\n%s", msg.c_str(), pointer.c_str());
 		return getUserInputInt();
+	}
+	int getCommandIndex(string command){
+		for(int i=0; i<commandCount; i++){
+			if(commandList[i] == command){
+				return i;
+			}
+		}
+		return -1;
 	}
 	Module(string name, string version, string baseStorage){
 		setName(name);

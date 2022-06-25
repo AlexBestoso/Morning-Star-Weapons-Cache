@@ -1,0 +1,19 @@
+cp->maxBruteLength: 8
+cp->startingBruteLength: 6
+cp->hostName: earth.local
+cp->ipAddress: 31.33.7.18
+cp->portNumber: 80
+cp->method: GET
+cp->uri: /admin/
+cp->httpVersion: HTTP/1.1
+cp->extraHeadersCount: 0
+cp->fetchedHeadersCount: 0
+cp->ignoreCookies: true
+cp->fetchCookiesOnce: true
+cp->cookieFetchUri: 
+cp->cookies: 
+cp->contentLength: 1
+cp->content: AA==
+cp->brutePos: 11	0
+cp->successStrings: HTTP/1.1 200	HTTP/1.1 301														
+cp->successStringsLogic: false	false	true	true	true	true	true	true	true	true	true	true	true	true	true	
