@@ -480,7 +480,7 @@ void loadSessionFromFile(struct CommandPacket *cp){
                 string tmpGrabber = "";
                 int track = 0;
                 for(int i=strlen("cp->successStringsLogic: "); i<grabber.length(); i++){
-                        if(grabber[i] == '\t' && track < 15){
+                        if(tmpGrabber[i] == '\t' && track < 15){
                                 if(grabber == "false")
                                         cp->successStringsLogic[track] = false;
                                 else
