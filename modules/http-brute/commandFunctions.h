@@ -7,19 +7,19 @@ void help(struct CommandPacket *cp){
         printf("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
 }
 void setStartingBruteLengthCommand(struct CommandPacket *cp){
-        printf("Enter a new starting brute length, the current is '%d'\n(~)> ", cp->startingBruteLength);
-        cp->startingBruteLength = cp->mod->getUserInputInt();
-        cp->permuter._mapperSize = cp->startingBruteLength;
+        printf("Enter a new starting brute length, the current is '%d'\n(~)> ", cp->permuter.startingBruteLength);
+        cp->permuter.startingBruteLength = cp->mod->getUserInputInt();
+        cp->permuter._mapperSize = cp->permuter.startingBruteLength;
         cp->mod->pSuccess("Starting brute length changed!\n");
 }
 void setMaxBruteLengthCommand(struct CommandPacket *cp){
-        printf("Enter a new max brute length, the current is '%d'\n(~)> ", cp->maxBruteLength);
-        cp->maxBruteLength = cp->mod->getUserInputInt();
+        printf("Enter a new max brute length, the current is '%d'\n(~)> ", cp->permuter.maxBruteLength);
+        cp->permuter.maxBruteLength = cp->mod->getUserInputInt();
         printf("[+] Max brute length changed!\n");
 }
 void modifyPermuteIncrementOrder(struct CommandPacket *cp){
         printf("+++++++++++++++++++++++++++++++++\n");
-        for(int i=0; i<cp->maxBruteLength; i++){
+        for(int i=0; i<cp->permuter.maxBruteLength; i++){
                 printf("(%d) Order Value : %d\n", i, cp->permuter._mapperIncOrder[i]);
         }
         printf("\n\nEnter the first order id you want swapped.\n(~)> ");
@@ -28,19 +28,19 @@ void modifyPermuteIncrementOrder(struct CommandPacket *cp){
         int b = cp->mod->getUserInputInt();
 
         cp->permuter.swapIncrementOrders(a, b);
-        for(int i=0; i<cp->maxBruteLength; i++){
+        for(int i=0; i<cp->permuter.maxBruteLength; i++){
                 printf("(%d) Order Value : %d\n", i, cp->permuter._mapperIncOrder[i]);
         }
         printf("+++++++++++++++++++++++++++++++++\n");
 }
 void showRoundValidChars(struct CommandPacket *cp){
-        for(int i=0; i<cp->maxBruteLength; i++){
+        for(int i=0; i<cp->permuter.maxBruteLength; i++){
                 printf("(%d) Round Valid Chars : %s\n", i, cp->permuter._validCharsArray[i].c_str());
         }
 }
 
 void printPermuterFrozenMapper(struct CommandPacket *cp){
-        for(int i=0; i<cp->maxBruteLength; i++){
+        for(int i=0; i<cp->permuter.maxBruteLength; i++){
                 printf("(%d) Is Round Frozen? || %d\n", i, cp->permuter._mapperFrozen[i]);
         }
 }
@@ -223,14 +223,14 @@ void loadSessionFromFile(struct CommandPacket *cp){
                 '5', '6', '7', '8', '9'
         };
 
-        grabber = fetchSessionFileLine("cp->maxBruteLength", sesh);
+        grabber = fetchSessionFileLine("cp->permuter.maxBruteLength", sesh);
         if(grabber != ""){
                 int multiplyer = 1;
-                cp->maxBruteLength = 0;
-                for(int i=grabber.length()-1; i>=strlen("cp->maxBruteLength: "); i--){
+                cp->permuter.maxBruteLength = 0;
+                for(int i=grabber.length()-1; i>=strlen("cp->permuter.maxBruteLength: "); i--){
                         for(int j=0; j<10; j++){
                                 if(grabber[i] == valids[j]){
-                                        cp->maxBruteLength += j*multiplyer;
+                                        cp->permuter.maxBruteLength += j*multiplyer;
                                         multiplyer *= 10;
                                         break;
                                 }
@@ -238,14 +238,14 @@ void loadSessionFromFile(struct CommandPacket *cp){
                 }
         }
 
-        grabber = fetchSessionFileLine("cp->startingBruteLength: ", sesh);
+        grabber = fetchSessionFileLine("cp->permuter.startingBruteLength: ", sesh);
         if(grabber != ""){
         int multiplyer = 1;
-                cp->startingBruteLength = 0;
-                for(int i=grabber.length()-1; i>=strlen("cp->startingBruteLength: "); i--){
+                cp->permuter.startingBruteLength = 0;
+                for(int i=grabber.length()-1; i>=strlen("cp->permuter.startingBruteLength: "); i--){
                         for(int j=0; j<10; j++){
                                 if(grabber[i] == valids[j]){
-                                        cp->startingBruteLength += j*multiplyer;
+                                        cp->permuter.startingBruteLength += j*multiplyer;
                                         multiplyer *= 10;
                                         break;
                                 }
@@ -678,9 +678,15 @@ void showConfigs(struct CommandPacket *cp){
 	printf("-  This section will be set up after the refactor.            -\n");
 	printf("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
 }
-void attackBruteForceCommand(struct CommandPacket *cp){
-        showConfigs(cp);
 
+void stopAttack(int sig){
+	printf("Signal Caught; Stopping attack\n");
+	cp.attacking = false;
+}
+
+void attackBruteForceCommand(struct CommandPacket *cp){
+	signal(SIGINT, stopAttack);
+        showConfigs(cp);
         string resp;
         printf("Would you like to clear the last run's result file? (y/N)\n(~)> ");
         resp = cp->mod->getUserInput();
@@ -710,12 +716,19 @@ void attackBruteForceCommand(struct CommandPacket *cp){
 	/*
          * Begining attack
          * */
+	cp->attacking = true;
         printf("Attack Launching!\n");
-        for(int i=cp->startingBruteLength; i<cp->maxBruteLength+1; i++){
+        for(int i=cp->permuter.startingBruteLength; i<cp->permuter.maxBruteLength+2; i++){
+		if(cp->attacking == false){
+			break;
+		}
                 cp->permuter._mapperSize = i;
                 cp->permuter.resetMapper();
                 printf("\t\tAdjusting payload length to %d\n", i);
                 while(cp->permuter._maxIncrement == false){
+			if(cp->attacking == false){
+				break;
+			}
                         string warHead = "";
                         for(int j=0; j<cp->permuter._mapperSize; j++){
                                 warHead += cp->permuter.getValueByI(j);
@@ -766,6 +779,7 @@ void attackBruteForceCommand(struct CommandPacket *cp){
                         cp->permuter.Increment();
                 }
         }
+	cp->attacking = false;
         printf("Attack Completed.\n");
 }
 void setSuccessStrings(struct CommandPacket *cp){
@@ -1297,15 +1311,15 @@ void saveSession(struct CommandPacket *cp){
         memset(tmp2, 0, 20);
 
         // 0
-        sprintf(tmp2, "%d", cp->maxBruteLength);
+        sprintf(tmp2, "%d", cp->permuter.maxBruteLength);
         tmp = tmp2;
-        fileData += "cp->maxBruteLength: "+tmp+"\r\n";
+        fileData += "cp->permuter.maxBruteLength: "+tmp+"\r\n";
 
         // 1
         memset(tmp2, 0, 20);
-        sprintf(tmp2, "%d", cp->startingBruteLength);
+        sprintf(tmp2, "%d", cp->permuter.startingBruteLength);
         tmp = tmp2;
-        fileData += "cp->startingBruteLength: "+tmp+"\r\n";
+        fileData += "cp->permuter.startingBruteLength: "+tmp+"\r\n";
 
         // 2
         fileData += "cp->hostName: " + cp->hostName + "\r\n";

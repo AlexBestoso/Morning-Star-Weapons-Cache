@@ -8,6 +8,16 @@ class Module{
 	string _moduleStorage = "";
 
 	public:
+	int getCommandIndex(string command, size_t size, string *list){
+                for(int i=0; i<size; i++){
+                        if(list[i] == command){
+                                return i;
+                        }
+                }
+                return -1;
+        }
+
+
 	size_t commandCount = 0;
 	string *commandList;
 	void pError(string msg){

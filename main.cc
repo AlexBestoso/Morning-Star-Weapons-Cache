@@ -12,6 +12,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <signal.h>
+#include <bits/sockaddr.h>
+#include <asm/types.h>
+#include <linux/rtnetlink.h>
+//#include <ifaddrs.h>
+#include <net/if.h>
+
 using namespace std;
 
 #include "./classes/btApplication.class.h"
@@ -29,6 +36,7 @@ using namespace std;
  * */
 #include "./modules/module.class.h"
 #include "./modules/http-brute/http-brute.module.h"
+#include "./modules/dns-spoof/dns-spoof.module.h"
 
 /*
  * Application Layer

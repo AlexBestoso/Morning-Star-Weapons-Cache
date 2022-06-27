@@ -2,15 +2,14 @@
 #define HEADERS_MAX 10
 #define CONTENT_MAX 500000
 #define MAX_NET_BUFFER 100000
+#define HTTP_BRUTE_COMMAND_COUNT 18
 
 struct CommandPacket{
 	size_t commandCount;
-        string *commandList;	
+        string commandList[HTTP_BRUTE_COMMAND_COUNT];	
 	Module *mod;
 	Permuter permuter;
 	string padding;
-	int maxBruteLength;
-	int startingBruteLength;
 	string resultsFile;
 	string hostName;
 	string ipAddress;
@@ -39,8 +38,9 @@ struct CommandPacket{
 	string successStrings[15];
 	bool successStringsLogic[15] = {false};
 	string sessionFile = "";
+	bool attacking = false;
 	
-};
+}cp;
 #include "./commandFunctions.h"
 class HttpBrute : Module{
 	private:	
@@ -52,23 +52,23 @@ class HttpBrute : Module{
 		const bool _useSsl = false; // unsupported at this time.
 
 		void _printPermuterValues(void){
-			printf("\tStarting Length : %d\n", commandPacket->startingBruteLength);
-			printf("\tMax Length : %d\n", commandPacket->maxBruteLength);
+			printf("\tStarting Length : %d\n", commandPacket->permuter.startingBruteLength);
+			printf("\tMax Length : %d\n", commandPacket->permuter.maxBruteLength);
 			printf("\tIncrememnt Mapper : ");
-			for(int i=0; i<commandPacket->maxBruteLength; i++)
+			for(int i=0; i<commandPacket->permuter.maxBruteLength; i++)
 				printf("%d ", commandPacket->permuter._mapper[i]);
 			printf("\n\tFrozen mapper : ");
-			for(int i=0; i<commandPacket->maxBruteLength; i++)
+			for(int i=0; i<commandPacket->permuter.maxBruteLength; i++)
                                 printf("%d ", commandPacket->permuter._mapperFrozen[i]);
 			printf("\n\tIncrement Order : ");
-			for(int i=0; i<commandPacket->maxBruteLength; i++)
+			for(int i=0; i<commandPacket->permuter.maxBruteLength; i++)
 				printf("%d ", commandPacket->permuter._mapperIncOrder[i]);
 			printf("\n\tValid Char Mappings :\n");
-			for(int i=0; i<commandPacket->maxBruteLength; i++)
+			for(int i=0; i<commandPacket->permuter.maxBruteLength; i++)
 				printf("\t\t%d) %s\n", i, commandPacket->permuter._validCharsArray[i].c_str());
 			printf("\n");
 		}
-		void (*commandFunctions[18])(struct CommandPacket*);
+		void (*commandFunctions[HTTP_BRUTE_COMMAND_COUNT])(struct CommandPacket*);
 
 
 	public:
@@ -91,14 +91,12 @@ class HttpBrute : Module{
                 return -1;
         }
 
-	struct CommandPacket cp;
 
 	void initStruct(){
 		cp.mod = this;
 		cp.running = true;
 
-		cp.commandCount = 18;
-		cp.commandList = (string *)malloc(sizeof(string)*cp.commandCount);
+		cp.commandCount = HTTP_BRUTE_COMMAND_COUNT;
 		cp.commandList[0] = "help";
 		this->commandFunctions[0] = help;
 
@@ -162,7 +160,7 @@ class HttpBrute : Module{
 		memset(commandPacket->content, 0, CONTENT_MAX);
 		commandPacket->permuter._validChars = "eariotnslcudpmhgbfywkvxzjq";
 		commandPacket->permuter._startingPattern = "eeeeeeeeeeeeeeee";
-		commandPacket->permuter._mapperSize = commandPacket->maxBruteLength;	
+		commandPacket->permuter._mapperSize = commandPacket->permuter.maxBruteLength;	
 		commandPacket->permuter.defaultMapper();
 		commandPacket->successStrings[0] = "HTTP/1.1 200";
 		commandPacket->successStrings[1] = "HTTP/1.1 301";
@@ -187,5 +185,6 @@ class HttpBrute : Module{
 	}
 	HttpBrute(string basePath) : Module("http-brute", "0.0.2", basePath){
 		initStruct();
+		run();
 	}
 };

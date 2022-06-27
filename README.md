@@ -1,11 +1,13 @@
 # Morning-Star-Weapons-Cache
-Version 0.0.1 Alpha<br>
+Version 0.0.2<br>
 <br>
 This cyber weapons cache is a multitool. One that you should keep in your pocket at all times. All weapons provided are built from scratch and installed as a module. 
 
-As of 0.0.1 Alpha, We have one functioning weapon in the toolkit. <br><br>
-
-This tool is called "http-brute".<br>
+Version 0.0.2 introduces a new weapon called "dns-spoof"<br>
+As of now, the dns-spoof module just lists the names of your available network interfaces. The plan is to implement ARP spoofing and gateway identification next.
+<br><br>
+Version 0.0.1 Alpha notes: <br>
+The other tool is called "http-brute".<br>
 <br>
 http-brute will allow you to fully define your HTTP packets. From cookies to completely unique HTTP headers.<br>
 The http-brute weapon also comes with a highly configurable permutation engine for brute force fuzzing.  The permuter allows you to define which chars to use in your brute force, the min and max lengths of the generated payload, the order that the digits of the string are incremented, and much more. <br>

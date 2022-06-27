@@ -17,6 +17,9 @@ class Permuter{
 		string _validCharsArray[20] = {""};
 		/* End size restriction. */
 
+		int startingBruteLength = 1;
+		int maxBruteLength = 6;
+
 		bool _maxIncrement = false;
 		
 		string _validChars = "";

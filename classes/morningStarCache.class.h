@@ -49,12 +49,13 @@ class MorningStarCache : BtApplication{
 
 		MorningStarCache() : BtApplication(){
 			this->version = "0.0.2a";
-			this->commandCount = 4;
+			this->commandCount = 5;
 			this->commandList = (string *)malloc(sizeof(string) * this->commandCount);
 			this->commandList[0] = "help";
         	        this->commandList[1] = "exit";
         	        this->commandList[2] = "http-brute";
 			this->commandList[3] = "show banner";
+			this->commandList[4] = "dns-spoof";
 
 			if(!initSystem()){
 				this->pError("Failed to init system.\n");
@@ -64,7 +65,7 @@ class MorningStarCache : BtApplication{
 		
 			_welcomeBanner();
 
-			HttpBrute httpBrute(basePath);
+
 			while(_running){
 				_userInput = this->getUserInput("(.)> ");
 				if(_userInput == "help"){
@@ -72,9 +73,11 @@ class MorningStarCache : BtApplication{
 				}else if(_userInput == "exit"){
 					_exitCommand();
 				}else if(_userInput == "http-brute"){
-					httpBrute.run();
+					HttpBrute httpBrute(basePath);
 				}else if(_userInput == "show banner"){
 					_welcomeBanner();
+				}else if(_userInput == "dns-spoof"){
+					DnsSpoof dnsSpoof(basePath);
 				}else{
 					printf("Invalid Command. Try the 'help' command\n");
 				}
