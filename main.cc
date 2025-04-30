@@ -38,7 +38,10 @@ using namespace std;
  * Application Layer
  * */
 #include "./morningStarCache.class.h"
-int main(void){
-	MorningStarCache cache;
+int main(int argc, char *argv[]){
+	string start = "";
+	if(argc > 1)
+		start = argv[1];
+	MorningStarCache cache(start);
 	exit(EXIT_SUCCESS);
 }

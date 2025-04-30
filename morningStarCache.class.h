@@ -207,12 +207,18 @@ class MorningStarCache{
 		return true;
 	}
 
-	MorningStarCache(){
+	MorningStarCache(string startCmd){
 		while(_running){
 			switch(_context){
 				case 0:
-					printf("(.)> ");
-					getline(cin, _userInput);
+					if(startCmd != ""){
+						_userInput = startCmd;
+						startCmd = "";
+					}else{
+						printf("(.)> ");
+						getline(cin, _userInput);
+					}
+
 					if(_userInput == "help"){
 						_helpCommand();		
 					}else if(_userInput == "exit"){

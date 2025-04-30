@@ -1,10 +1,12 @@
 #define PORT_PROBE_CMD_BUF_SIZE 4098
-#define PORT_PROBE_AVAILABLE_COMMAND_COUNT 4
+#define PORT_PROBE_AVAILABLE_COMMAND_COUNT 5
 
 #define PORT_PROBE_CMDMAP_HELP 0
 #define PORT_PROBE_CMDMAP_EXIT 1
 #define PORT_PROBE_CMDMAP_SETHOST 2
 #define PORT_PROBE_CMDMAP_INFO 3
+#define PORT_PROBE_CMDMAP_SETPORT 4
+
 class PortProbe : public Module{
 	private:
 		string host = "";
@@ -13,12 +15,15 @@ class PortProbe : public Module{
 		char cmdBuf[PORT_PROBE_CMD_BUF_SIZE];
 		size_t cmdSize = 0;
 
+		int portlist[65535] = {0};
+
 		int availableCommandsCount = PORT_PROBE_AVAILABLE_COMMAND_COUNT;
 		string availableCommands[PORT_PROBE_AVAILABLE_COMMAND_COUNT] = {
 			"help",
 			"exit",
 			"setHost",
-			"info"
+			"info",
+			"setPort"
 		};
 		
 		string getArg(int target){
@@ -50,6 +55,10 @@ class PortProbe : public Module{
 
 		void headsUpDisplay(void){
 			printf("Host: '%s'\n", host.c_str());
+			printf("Target Ports : ");
+			for(int i=0; i<65535 && portlist[i] != 0; i++){
+				printf("%d ", portlist[i]);
+			}printf("\n");
 		}
 	public:
 
@@ -75,7 +84,63 @@ class PortProbe : public Module{
 				case PORT_PROBE_CMDMAP_INFO:{
 					headsUpDisplay();
 				}break;
+				case PORT_PROBE_CMDMAP_SETPORT:{
+					if(cmdSize < 2){
+						printf("[E] usage : setPort <port> [<port-range>] [<port-range>] [<port>]\n");
+						break;
+					}
+					for(int i=0; i<65535; i++) portlist[i] = 0;
+					int b=0;
+					for(int i=1; i<cmdSize; i++){
+						string val = getArg(i);
+						bool ranged = false;
+						for(int j=0; j<val.length(); j++){
+							if(val[j] == '-')
+								ranged = true;
+						}
+						if(ranged){
+							int start =0;
+							int end = 0;
+							string g="";
+							int leftOff = 0;
+							for(int j=0; j<val.length(); j++){
+								if(val[j] == '-'){
+									start = stoi(g.c_str());
+									leftOff = j+1;
+									break;
+								}
+								g+=val[j];
+							}
+							string gg = "";
+							for(int j=leftOff; j<val.length(); j++){
+								gg += val[j];
+							}
+							end = stoi(gg.c_str());
 
+							for(int j=start; j<=end; j++){
+								bool skip = false;
+								for(int a=0; a<b; a++) if(portlist[a] == j) skip = true;
+								if(skip) continue;
+
+								portlist[b] = j;
+								b++;
+							}
+						}else{
+							bool skip = false;
+							string g = "";
+							int vali = 0;
+							for(int j=0; j<val.length(); j++){
+								g += val[j];
+							}
+							vali = stoi(g.c_str());
+							for(int a=0; a<b; a++) if(portlist[a] == vali) skip = true;
+                                                                if(skip) continue;
+							portlist[b] = vali;
+							b++;
+						}
+					}
+					headsUpDisplay();
+				}break;
 				case PORT_PROBE_CMDMAP_HELP:
 				default:{
 					printf("Available Commands : %d\n", availableCommandsCount);
