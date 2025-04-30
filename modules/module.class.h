@@ -6,6 +6,7 @@ class Module{
 	int _context = -1;
 	string _baseStorage = "./storage";
 	string _moduleStorage = "";
+	SqlSnake *sqlsnake;
 
 	public:
 	string getName(void){
@@ -86,4 +87,15 @@ class Module{
 		_moduleStorage += baseStorage + "/" + name + "_" + version;
 		generateModuleBaseDir();
 	}
+	
+	Module(string name, string version, string baseStorage, SqlSnake *sqlsnake){
+		setName(name);
+		setVersion(version);
+		_baseStorage = baseStorage;
+		_moduleStorage = "";
+		_moduleStorage += baseStorage + "/" + name + "_" + version;
+		generateModuleBaseDir();
+		this->sqlsnake = sqlsnake;
+	}
+
 };

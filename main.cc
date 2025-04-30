@@ -15,10 +15,15 @@
 
 using namespace std;
 /*
+ * data layer
+ * */
+#include "./database.h"
+/*
  * Tool Layer
  * */
-#include "./netsnake.class.h"
-#include "./fileSnake.class.h"
+#include "./snakes/netsnake.class.h"
+#include "./snakes/fileSnake.class.h"
+#include "./snakes/sqlSnake.class.h"
 #include "./base64.class.h"
 #include  "./permuter.class.h"
 
@@ -27,6 +32,7 @@ using namespace std;
  * */
 #include "./modules/module.class.h"
 #include "./modules/http-brute/http-brute.module.h"
+#include "./modules/port-probe/port-probe.module.h"
 
 /*
  * Application Layer
