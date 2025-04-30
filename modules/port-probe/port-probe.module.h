@@ -1,9 +1,10 @@
 #define PORT_PROBE_CMD_BUF_SIZE 4098
-#define PORT_PROBE_AVAILABLE_COMMAND_COUNT 3
+#define PORT_PROBE_AVAILABLE_COMMAND_COUNT 4
 
 #define PORT_PROBE_CMDMAP_HELP 0
 #define PORT_PROBE_CMDMAP_EXIT 1
 #define PORT_PROBE_CMDMAP_SETHOST 2
+#define PORT_PROBE_CMDMAP_INFO 3
 class PortProbe : public Module{
 	private:
 		string host = "";
@@ -16,7 +17,8 @@ class PortProbe : public Module{
 		string availableCommands[PORT_PROBE_AVAILABLE_COMMAND_COUNT] = {
 			"help",
 			"exit",
-			"setHost"
+			"setHost",
+			"info"
 		};
 		
 		string getArg(int target){
@@ -45,6 +47,10 @@ class PortProbe : public Module{
 			}
 			return 0;
 		}
+
+		void headsUpDisplay(void){
+			printf("Host: '%s'\n", host.c_str());
+		}
 	public:
 
 	PortProbe(string basePath, SqlSnake *sqlsnake) : Module("port-probe", "0.0.0", basePath, sqlsnake){
@@ -58,8 +64,18 @@ class PortProbe : public Module{
 					this->setRunning(false);
                                 }break;
 				case PORT_PROBE_CMDMAP_SETHOST:{
-					printf("running sethost\n");
+					if(cmdSize != 2){
+						printf("[E] usage : setHost <targetHost>\n");
+						break;
+					}
+
+					host = getArg(1);
+					printf("[*] Host: %s\n", host.c_str());
 				}break;
+				case PORT_PROBE_CMDMAP_INFO:{
+					headsUpDisplay();
+				}break;
+
 				case PORT_PROBE_CMDMAP_HELP:
 				default:{
 					printf("Available Commands : %d\n", availableCommandsCount);
